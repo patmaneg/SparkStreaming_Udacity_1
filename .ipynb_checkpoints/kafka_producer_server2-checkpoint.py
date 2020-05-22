@@ -4,7 +4,7 @@ import json
 import time
 
 BROKER_URL = "PLAINTEXT://localhost:9092"
-TOPIC_NAME = "productor"
+TOPIC_NAME = "mitopico"
 
 p = Producer({"bootstrap.servers": BROKER_URL})
 #p2 = KafkaProducer(bootstrap_servers='localhost:9092')

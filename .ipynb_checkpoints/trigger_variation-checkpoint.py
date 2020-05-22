@@ -8,6 +8,9 @@ def run_spark_job(spark):
         .format("kafka") \
         .option("kafka.bootstrap.servers", "localhost:9092") \
         .option("subscribe", "mitopico") \
+        .option("startingOffsets", "earliest") \
+        .option("maxOffsetsPerTrigger", 10) \
+        .option("stopGracefullyOnShutdown", "true") \
         .load()
     
     """
@@ -24,10 +27,10 @@ def run_spark_job(spark):
     # Show schema for the incoming resources for checks
     df.printSchema()
 
-    agg_df = df.count()
+    agg_df = df.groupBy("topic").count()
 
     # TODO play around with processingTime and once parameter in trigger to see how the progress report changes
-    query = agg_df.writeStream.trigger(processingTime="10").outputMode('Complete').format('console').option("truncate", "false").start()
+    query = agg_df.writeStream.trigger(processingTime="30 seconds").outputMode('Complete').format('console').option("truncate", "false").start()
 
 
 if __name__ == "__main__":

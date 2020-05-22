@@ -7,21 +7,26 @@ def run_spark_job(spark):
     df = spark \
         .readStream \
         .format("kafka") \
-        .option("kafka.bootstrap.servers", "localhost:9092") \
-        .option("subscribe", "mitopico") \
+        .option("kafka.bootstrap.servers", "localhost:<your port>") \
+        .option("subscribe", "<your topic name>") \
+        .option("startingOffsets", "earliest") \
+        .option("maxOffsetsPerTrigger", 10) \
+        .option("maxRatePerPartition", 10) \
+        .option("stopGracefullyOnShutdown", "true") \
         .load()
 
     # Show schema for the incoming resources for checks
     df.printSchema()
 
-    agg_df = df.count()
+    agg_df = df.groupby("topic").count()
 
     # TODO complete this
     # play around with processingTime to see how the progress report changes
     query = agg_df \
         .writeStream \
-        .trigger(processingTime=20) \
-        .format("console") \
+        .trigger(processingTime="10 seconds") \
+        .outputMode('Complete') \
+        .format('console') \
         .option("truncate", "false") \
         .start()
 
