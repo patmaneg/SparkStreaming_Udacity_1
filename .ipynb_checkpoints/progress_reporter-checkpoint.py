@@ -18,7 +18,12 @@ def run_spark_job(spark):
 
     # TODO complete this
     # play around with processingTime to see how the progress report changes
-    #query =
+    query = agg_df \
+        .writeStream \
+        .trigger(processingTime=20) \
+        .format("console") \
+        .option("truncate", "false") \
+        .start()
 
 
 if __name__ == "__main__":
